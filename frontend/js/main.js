@@ -102,3 +102,52 @@
 
 })(jQuery);
 
+
+
+// Navbar ve footer'ı yükleyen fonksiyon
+function loadComponent(selector, file) {
+  fetch(file)
+    .then(response => response.text())
+    .then(data => {
+      document.querySelector(selector).innerHTML = data;
+    })
+    .catch(error => console.log('Bileşen yüklenirken hata oluştu:', error));
+}
+
+// Sayfa yüklendiğinde navbar ve footer'ı çağır
+window.onload = () => {
+  loadComponent('#navbar', 'NAVBAR.html');
+  loadComponent('#footer', 'FOOTER.html');
+};
+
+
+function loadComponent(selector, file) {
+    fetch(file)
+      .then(response => response.text())
+      .then(data => {
+        document.querySelector(selector).innerHTML = data;
+        if (selector === '#navbar') {
+          highlightActiveLink();
+        }
+      })
+      .catch(error => console.log('Bileşen yüklenirken hata oluştu:', error));
+  }
+  
+  // Aktif bağlantıyı vurgulayan fonksiyon
+  function highlightActiveLink() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('#navbar a');
+  
+    navLinks.forEach(link => {
+      // Bağlantının href değeriyle geçerli sayfanın yolunu karşılaştır
+      if (link.getAttribute('href') === currentPath.split('/').pop()) {
+        link.classList.add('active');
+      }
+    });
+  }
+  
+  // Sayfa yüklendiğinde navbar ve footer'ı çağır
+  window.onload = () => {
+    loadComponent('#navbar', 'NAVBAR.html');
+    loadComponent('#footer', 'FOOTER.html');
+  };
