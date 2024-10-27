@@ -892,3 +892,20 @@
     font-weight: bold;
   }
   
+
+/* Buton için stil ayarları */
+.btn-blue {
+    background-color: #007bff; /* Mavi arka plan rengi */
+    color: white; /* Beyaz metin rengi */
+    padding: 16px 16px; /* İç boşluk */
+    border-radius: 4px; /* Hafif yuvarlatılmış köşeler */
+    text-decoration: none; /* Alt çizgiyi kaldır */
+    margin-left: 15px; /* Diğer bağlantılardan boşluk */
+
+}
+
+.btn-blue:hover {
+    background-color: #0056b3; /* Hover rengi */
+}
+
+
