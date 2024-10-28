@@ -167,13 +167,15 @@ window.onload = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const profileBtn = document.getElementById('profile-btn');
     const loginBtn = document.getElementById('login-btn');
-
+    const forumPage = document.getElementById('forum-page');
     if (user) {
         profileBtn.style.display = 'block';
+        forumPage.style.display = 'block';
         loginBtn.style.display = 'none';
     } else {
         profileBtn.style.display = 'none';
         loginBtn.style.display = 'block';
+        forumPage.style.display = 'none';
     }
 };
 
