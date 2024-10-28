@@ -243,29 +243,31 @@
         <!-- Template Javascript -->
         <script src="js/main.js"></script>
 
-        <script>
-            document.querySelector('.btn').addEventListener('click', async () => {
-                const email = document.querySelector('input[type="email"]').value;
-                const password = document.querySelector('input[type="password"]').value;
-    
-                try {
-                    const response = await fetch('http://localhost:3005/api/users/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
-                    });
-    
-                    const result = await response.json();
-                    if (response.ok) {
-                        alert(result.message); // Başarılı giriş
-                    } else {
-                        alert(result.error); // Hata mesajı
-                    }
-                } catch (error) {
-                    alert('Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
-                }
-            });
-        </script>
+       <script>
+ document.querySelector('.btn').addEventListener('click', async () => {
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.querySelector('input[type="password"]').value;
+
+    try {
+        const response = await fetch('http://localhost:3005/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message); // Başarılı giriş mesajı
+            localStorage.setItem('user', JSON.stringify(result.user)); // Kullanıcı bilgisini localStorage'a kaydet
+            window.location.href = 'index.html'; // Profile sayfasına yönlendirme
+        } else {
+            alert(result.error); // Hata mesajı
+        }
+    } catch (error) {
+        alert('Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
+    }
+});
+       </script>
 
     </body>
 

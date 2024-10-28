@@ -146,8 +146,35 @@ function loadComponent(selector, file) {
     });
   }
   
+ 
+
   // Sayfa yüklendiğinde navbar ve footer'ı çağır
-  window.onload = () => {
-    loadComponent('#navbar', 'NAVBAR.html');
-    loadComponent('#footer', 'FOOTER.html');
-  };
+// Bileşenleri yüklemek ve kullanıcı durumunu ayarlamak için tek bir fonksiyon
+window.onload = async () => {
+    // Bileşen yükleme fonksiyonu
+    const loadComponent = async (selector, file) => {
+        const element = document.querySelector(selector);
+        const response = await fetch(file);
+        const html = await response.text();
+        element.innerHTML = html;
+    };
+
+    // Navbar ve Footer bileşenlerini yükleme
+    await loadComponent('#navbar', 'NAVBAR.html');
+    await loadComponent('#footer', 'FOOTER.html');
+
+    // Kullanıcı bilgilerini localStorage'dan al ve butonları ayarla
+    const user = JSON.parse(localStorage.getItem('user'));
+    const profileBtn = document.getElementById('profile-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    if (user) {
+        profileBtn.style.display = 'block';
+        loginBtn.style.display = 'none';
+    } else {
+        profileBtn.style.display = 'none';
+        loginBtn.style.display = 'block';
+    }
+};
+
+

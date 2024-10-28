@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>Profile</h1>
+    <div id="profile-info">
+        <!-- Kullanıcı bilgileri burada görünecek -->
+    </div>
+    <a href="index.html">ana sayfa</a>
+    <a href="index.html" onclick="logout()">Log Out</a>
+
+    <script>
+        // Kullanıcı bilgilerini yükleme
+        function loadProfile() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('profile-info').innerHTML = `
+                    <p>Email: ${user.email}</p>
+                    <p>Name: ${user.name}</p>
+                    <p>Surname: ${user.surname}</p>
+                `;
+            } else {
+                alert('Lütfen giriş yapın');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Çıkış yapma fonksiyonu
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Sayfa yüklendiğinde kullanıcı bilgilerini göster
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+</html>
