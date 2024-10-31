@@ -193,6 +193,7 @@
                             <div class="form-group">
                                 <input type="text" class="form-control" placeholder="Surname">
                             </div>
+                            
                             <div class="form-group"></div>
                                 <input type="password" class="form-control" placeholder="Password">
                             </div>
@@ -250,30 +251,41 @@
 
    
         <script>
-            document.querySelector('.btn').addEventListener('click', async () => {
+            document.querySelector('.btn').addEventListener('click', signupFunction);
+            
+            // Define the function for signup to reuse it
+            async function signupFunction() {
                 const email = document.querySelector('input[type="email"]').value;
                 const name = document.querySelector('input[placeholder="Name"]').value;
                 const surname = document.querySelector('input[placeholder="Surname"]').value;
+              
                 const password = document.querySelector('input[type="password"]').value;
-    
+            
                 try {
                     const response = await fetch('http://localhost:3005/api/users/signup', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, name, surname, password })
+                        body: JSON.stringify({ email, name, surname,password })
                     });
-    
+            
                     const result = await response.json();
                     if (response.ok) {
-                        alert(result.message); // Başarılı kayıt
+                        alert(result.message); // Successful registration message
                     } else {
-                        alert(result.error); // Hata mesajı
+                        alert(result.error); // Error message
                     }
                 } catch (error) {
-                    alert('Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
+                    alert('Unable to reach the server. Please try again.');
+                }
+            }
+            
+            // Add event listener for "Enter" key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    signupFunction();
                 }
             });
-        </script>
+            </script>
     </body>
 
 </html>

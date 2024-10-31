@@ -50,6 +50,23 @@ app.post('/api/users/login', (req, res) => {
     });
 });
 
+// Kullanıcının apartman numarasını getiren endpoint
+// Kullanıcının apartman numarasını getiren endpoint
+app.get('/api/users/:resident_id/apartment', (req, res) => {
+    const { resident_id } = req.params; // resident_id'yi al
+    const query = `SELECT apartment_number FROM apartments WHERE resident_id = ?`; // resident_id ile sorgula
+    db.get(query, [resident_id], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: 'Apartman numarası getirilemedi' });
+        } else if (row) {
+            res.json({ apartment_number: row.apartment_number }); // apartment_number döndür
+        } else {
+            res.status(404).json({ error: 'Apartman numarası bulunamadı' });
+        }
+    });
+});
+
+
 // Sunucuyu Başlatma
 const PORT = 3005;
 app.listen(PORT, () => {

@@ -243,31 +243,41 @@
         <!-- Template Javascript -->
         <script src="js/main.js"></script>
 
-       <script>
- document.querySelector('.btn').addEventListener('click', async () => {
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
-
-    try {
-        const response = await fetch('http://localhost:3005/api/users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message); // Başarılı giriş mesajı
-            localStorage.setItem('user', JSON.stringify(result.user)); // Kullanıcı bilgisini localStorage'a kaydet
-            window.location.href = 'index.html'; // Profile sayfasına yönlendirme
-        } else {
-            alert(result.error); // Hata mesajı
-        }
-    } catch (error) {
-        alert('Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
-    }
-});
-       </script>
+        <script>
+            document.querySelector('.btn').addEventListener('click', loginFunction);
+            
+            // Define the function for login to reuse it
+            async function loginFunction() {
+                const email = document.querySelector('input[type="email"]').value;
+                const password = document.querySelector('input[type="password"]').value;
+            
+                try {
+                    const response = await fetch('http://localhost:3005/api/users/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+            
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert(result.message); // Successful login message
+                        localStorage.setItem('user', JSON.stringify(result.user)); // Save user info
+                        window.location.href = 'index.html'; // Redirect
+                    } else {
+                        alert(result.error); // Error message
+                    }
+                } catch (error) {
+                    alert('Unable to reach the server. Please try again.');
+                }
+            }
+            
+            // Add event listener for "Enter" key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    loginFunction();
+                }
+            });
+            </script>
 
     </body>
 
