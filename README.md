@@ -5,6 +5,7 @@ cd backend && node app.js
 To start frontend server:
 
 cd frontend && python3 -m http.server {your selected port}
+cd frontend && http-server -p {your selected port}
 
 To check database:
 
