@@ -32,13 +32,13 @@
     <h1 style="text-align: center; color: #16243d;">Post Your Message</h1>
 
     <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px;margin-bottom: 20px;">
-        <form>
+        <form id="messageForm">
             <!-- Radio buttons for Anonymous or Name -->
             <div class="mb-3">
                 <label class="form-label" style="color: #ffffff;">Post As:</label><br>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="postType" id="anonymous" value="anonymous" checked>
-                    <label class="form-check-label" for="anonymous" style="color: #ffffff;">Anonymous</label>
+                    <label class="form-check-label" for="anonymous" id="named" style="color: #ffffff;">Anonymous</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="postType" id="name" value="name">
@@ -52,7 +52,6 @@
                 <textarea class="form-control" id="messageInput" placeholder="Type your message here..." style="height: 9em;"></textarea>
             </div>
             
-    
             <!-- Post button aligned to the right -->
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">Post</button>
@@ -73,40 +72,36 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    
     <script>
-        document.querySelector('form').addEventListener('submit', function (event) {
-            event.preventDefault();
-            
-            const message = document.getElementById('messageInput').value;
-            const isAnonymous = document.getElementById('anonymous').checked;
-            
-            // Kullanıcı adını almak için bir API isteği yapabiliriz veya başka bir yolla alınabilir
-            const name = isAnonymous ? 'Anonymous' : 'Kullanıcı Adı'; // Burayı gerçek kullanıcı adı ile güncelleyin
-        
-            // Kullanıcı kimliğini almak için mevcut oturumu kontrol edin
-            fetch('/api/session') // Kullanıcı oturumunu kontrol eden bir endpoint
-                .then(response => {
-                    if (!response.ok) throw new Error('Oturum bulunamadı');
-                    return response.json();
-                })
-                .then(sessionData => {
-                    const userId = sessionData.userId; // Oturumdan kullanıcı kimliğini al
-                    return fetch('/api/messages', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId, message, isAnonymous, name }) // userId'yi uygun bir şekilde güncelleyin
-                    });
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Mesaj gönderildikten sonra yanıtı kontrol etmek için
-                    document.getElementById('messageInput').value = ''; // Mesaj alanını temizle
-                })
-                .catch(error => console.error('Mesaj gönderme hatası:', error));
-        });
-        </script>
-        
-
+        const isAnonymous = document.getElementById('anonymous');
+        document.querySelector('.btn').addEventListener('click', sendMessageFunc);
+    
+        async function sendMessageFunc() {
+            const userID = localStorage.getItem('userID');
+            const username = isAnonymous.checked ? "Anonymous" : localStorage.getItem('userName'); // Değişiklik burada
+            const message = document.getElementById('messageInput').value; // Textarea ID'si güncellendi
+    
+            try {
+                const response = await fetch('http://localhost:3005/api/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userID, username, message }),
+                });
+    
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                } else {
+                    alert(result.error);
+                }
+            } catch (error) {
+                alert('Mesaj gönderme hatası: ' + error);
+            }
+        }
+    </script>
 </body>
 
 </html>
