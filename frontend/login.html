@@ -261,6 +261,7 @@
                     if (response.ok) {
                         alert(result.message); // Successful login message
                         localStorage.setItem('user', JSON.stringify(result.user)); // Save user info
+
                         window.location.href = 'index.html'; // Redirect
                     } else {
                         alert(result.error); // Error message

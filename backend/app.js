@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
+const { stringify } = require('querystring');
 
 // CORS ayarları
 app.use(cors());
@@ -110,6 +111,38 @@ app.get('/api/messages', (req, res) => {
         res.json(rows);
     });
 });
+
+
+// Endpoint to get userID based on first name and last name
+app.post('/api/getUserID', async (req, res) => {
+    const { firstName, lastName } = req.body;
+    const query = `SELECT id FROM users WHERE name = ? AND surname = ?`;
+    
+    db.get(query, [firstName, lastName], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: 'Kullanıcı kimliği getirilemedi' });
+        } else if (row) {
+            res.json({ id: row.id });
+
+        } else {
+            res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+        }
+    });
+});
+
+
+
+// Endpoint to assign apartment with resident_id as userID
+app.post('/api/assignApartment', async (req, res) => {
+    const { resident_id, apartmentNo } = req.body;
+    try {
+        await db.run('INSERT INTO apartments (apartment_number, resident_id) VALUES (?, ?)', [apartmentNo, resident_id]);
+        res.json({ message: 'Apartment assigned successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to assign apartment' });
+    }
+});
+
 
 // Sunucuyu Başlatma
 const PORT = 3005;

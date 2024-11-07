@@ -34,24 +34,24 @@
     <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px;margin-bottom: 20px;">
         <form id="messageForm">
             <!-- Radio buttons for Anonymous or Name -->
-            <div class="mb-3">
+            <div class="mb-3" id="postTypeContainer">
                 <label class="form-label" style="color: #ffffff;">Post As:</label><br>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="postType" id="anonymous" value="anonymous" checked>
-                    <label class="form-check-label" for="anonymous" id="named" style="color: #ffffff;">Anonymous</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="postType" id="name" value="name">
+                    <input class="form-check-input" type="radio" name="postType" id="name" value="name" checked>
                     <label class="form-check-label" for="name" style="color: #ffffff;">Named</label>
                 </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="postType" id="anonymous" value="anonymous">
+                    <label class="form-check-label" for="anonymous" style="color: #ffffff;">Anonymous</label>
+                </div>
             </div>
-    
+
             <!-- Text input field for the message -->
             <div class="mb-3">
                 <label for="messageInput" class="form-label" style="color: #ffffff;">Your Message</label>
                 <textarea class="form-control" id="messageInput" placeholder="Type your message here..." style="height: 9em;"></textarea>
             </div>
-            
+
             <!-- Post button aligned to the right -->
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">Post</button>
@@ -101,6 +101,18 @@
                 alert('Mesaj gönderme hatası: ' + error);
             }
         }
+    </script>
+    <script>
+            document.addEventListener("DOMContentLoaded", () => {
+            const anonButton = document.getElementById("anonymous");
+            const postTypeContainer = document.getElementById("postTypeContainer");
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (user.role === "manager") {
+                // Hide the radio buttons if the user is a manager
+                postTypeContainer.style.display = 'none';
+            }
+        });
     </script>
 </body>
 

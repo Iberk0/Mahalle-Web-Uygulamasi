@@ -284,6 +284,10 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
     <script>
+        
+
+
+
         async function loadMessages() {
             try {
                 const response = await fetch('http://localhost:3005/api/messages'); // Mesajları almak için API endpoint'i
@@ -299,7 +303,14 @@
                 messages.forEach(message => {
                     const messageElement = document.createElement('div');
                     messageElement.className = 'mb-3';
-                    messageElement.innerHTML = `<strong>${message.username || 'Anonymous'}</strong> -> ${message.message} <br><small>${new Date(message.messagetime).toLocaleString()}</small>`;
+                    if(message.username === "manager"){
+                        messageElement.innerHTML = `<strong style="color: #FF1414;">${message.username || 'Anonymous'}</strong> -> ${message.message} <br><small>${new Date(message.messagetime).toLocaleString()}</small>`;
+
+                    }
+                    else{
+                        messageElement.innerHTML = `<strong>${message.username || 'Anonymous'}</strong> -> ${message.message} <br><small>${new Date(message.messagetime).toLocaleString()}</small>`;
+
+                    }
                     messagesContainer.appendChild(messageElement);
                 });
             } catch (error) {
