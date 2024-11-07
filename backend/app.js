@@ -143,6 +143,21 @@ app.post('/api/assignApartment', async (req, res) => {
     }
 });
 
+// Mesaj silme (Delete Message)
+app.delete('/api/messages/:messageID', (req, res) => {
+    const messageID = req.params.messageID; // messageID'yi req.params ile alıyoruz
+    const query = `DELETE FROM messages WHERE messageID = ?`;
+
+    db.run(query, [messageID], function (err) {
+        if (err) {
+            res.status(500).json({ error: 'Mesaj silinemedi' });
+        } else if (this.changes > 0) {
+            res.json({ message: 'Mesaj silindi' });
+        } else {
+            res.status(404).json({ error: 'Mesaj bulunamadı' });
+        }
+    });
+});
 
 // Sunucuyu Başlatma
 const PORT = 3005;

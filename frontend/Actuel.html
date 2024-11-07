@@ -284,44 +284,82 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
     <script>
-        
+async function loadMessages() {
+    try {
+        const response = await fetch('http://localhost:3005/api/messages');
+        const messages = await response.json();
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.innerHTML = ''; // Önceki mesajları temizle
 
+        messages.sort((a, b) => new Date(b.messagetime) - new Date(a.messagetime));
 
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'd-flex justify-content-between mb-3';
 
-        async function loadMessages() {
-            try {
-                const response = await fetch('http://localhost:3005/api/messages'); // Mesajları almak için API endpoint'i
-                const messages = await response.json();
+            const messageContent = document.createElement('div');
+            messageContent.innerHTML = `
+                <strong style="color: ${message.username === 'manager' ? '#FF1414' : 'black'};">
+                    ${message.username || 'Anonymous'}
+                </strong> -> ${message.message} 
+                <br><small>${new Date(message.messagetime).toLocaleString()}</small>
+            `;
 
-                const messagesContainer = document.getElementById('messages');
-                messagesContainer.innerHTML = ''; // Önceki mesajları temizle
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.role === "manager") {
+                const removeButton = document.createElement('button');
+                removeButton.className = 'btn';
+                removeButton.style.cssText = `
+                    height: 30px; 
+                    width: 30px; 
+                    border: none; 
+                    background-color: white; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    color: red;
+                `;
+                removeButton.textContent = 'X';
 
-                // Mesajları zaman damgasına göre ters sırala (en yenisi en üstte)
-                messages.sort((a, b) => new Date(b.messagetime) - new Date(a.messagetime));
+                removeButton.addEventListener('click', async () => {
+                    try {
+                        const deleteResponse = await fetch(`http://localhost:3005/api/messages/${message.messageID}`, {
+                            method: 'DELETE'
+                        });
+                        const result = await deleteResponse.json();
 
-                // Mesajları döngü ile ekleyelim
-                messages.forEach(message => {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'mb-3';
-                    if(message.username === "manager"){
-                        messageElement.innerHTML = `<strong style="color: #FF1414;">${message.username || 'Anonymous'}</strong> -> ${message.message} <br><small>${new Date(message.messagetime).toLocaleString()}</small>`;
-
+                        if (deleteResponse.ok) {
+                            alert('Mesaj silindi');
+                            loadMessages(); // Sayfayı yenile
+                        } else {
+                            alert(result.error || 'Mesaj silinemedi');
+                        }
+                    } catch (error) {
+                        console.error('Mesaj silinirken hata oluştu:', error);
+                        alert('Mesaj silinemedi');
                     }
-                    else{
-                        messageElement.innerHTML = `<strong>${message.username || 'Anonymous'}</strong> -> ${message.message} <br><small>${new Date(message.messagetime).toLocaleString()}</small>`;
-
-                    }
-                    messagesContainer.appendChild(messageElement);
                 });
-            } catch (error) {
-                console.error('Mesajları yüklerken hata oluştu:', error);
-            }
-        }
 
-        // Sayfa yüklendiğinde mesajları yükle
-        window.onload = loadMessages;
-        setInterval(fetchMessages, 5000);
+                messageElement.appendChild(removeButton);
+            }
+
+            messageElement.prepend(messageContent);
+            messagesContainer.appendChild(messageElement);
+        });
+    } catch (error) {
+        console.error('Mesajları yüklerken hata oluştu:', error);
+    }
+}
+
+window.onload = loadMessages;
+setInterval(loadMessages, 5000); // Mesajları her 5 saniyede bir yenile
+
+
     </script>
+
+
+
  
 
 </body>

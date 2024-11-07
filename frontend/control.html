@@ -31,34 +31,68 @@
     <body>
     <div id="navbar"></div>
 
-    <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px; margin-bottom: 20px;">
-        <h1 style="color: antiquewhite;" class="text-center mb-4">Assign Apartment No</h1>
+    <div class="container-flex d-flex justify-content-around p-5"> 
+        <!-- İlk Kart -->
+        <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px; margin-bottom: 20px;">
+            <h1 style="color: antiquewhite;" class="text-center mb-4">Assign Apartment</h1>
+    
+            <form id="assignmentForm1">
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label for="firstName" class="form-label" style="color: #ffffff;">First Name</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                </div>
+                
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="lastName" class="form-label" style="color: #ffffff;">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                </div>
+    
+                <!-- Apartment Number -->
+                <div class="mb-3">
+                    <label for="apartmentNo" class="form-label" style="color: #ffffff;">Apartment Number</label>
+                    <input type="text" class="form-control" id="apartmentNo" required>
+                </div>
+    
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Assign</button>
+                </div>
+            </form>
+        </div>
+    
+        <!-- İkinci Kart -->
+        <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px; margin-bottom: 20px;">
+            <h1 style="color: antiquewhite;" class="text-center mb-4">Check Apartment Number</h1>
+    
+            <form id="assignmentForm2">
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label  class="form-label" style="color: #ffffff;">First Name</label>
+                    <input type="text" class="form-control" id="firstName2" required>
+                </div>
+                
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label  class="form-label" style="color: #ffffff;">Last Name</label>
+                    <input type="text" class="form-control" id="lastName2" required>
+                </div>
+    
+                <!-- Apartment Number -->
+                <div class="mb-3">
+                    <label  class="form-label" style="color: #ffffff;">Apartment Number</label>
+                    <textarea class="form-control" readonly style="background-color: white; color: black; cursor:none; height:38px;"></textarea>
+                </div>
 
-        <form id="assignmentForm">
-            <!-- First Name -->
-            <div class="mb-3">
-                <label for="firstName" class="form-label" style="color: #ffffff;">First Name</label>
-                <input type="text" class="form-control" id="firstName" required>
-            </div>
-            
-            <!-- Last Name -->
-            <div class="mb-3">
-                <label for="lastName" class="form-label" style="color: #ffffff;">Last Name</label>
-                <input type="text" class="form-control" id="lastName" required>
-            </div>
-
-            <!-- Apartment Number -->
-            <div class="mb-3">
-                <label for="apartmentNo" class="form-label" style="color: #ffffff;">Apartment Number</label>
-                <input type="text" class="form-control" id="apartmentNo" required>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">Assign</button>
-            </div>
-        </form>
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Check</button>
+                </div>
+            </form>
+        </div>
     </div>
+    
 </div>
 
 
@@ -123,7 +157,51 @@
 });
 
         </script>
-   
+        <script>
+            document.getElementById('assignmentForm2').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Formun varsayılan submit davranışını engelle
+
+    const firstName = document.getElementById('firstName2').value;
+    const lastName = document.getElementById('lastName2').value;
+    const apartmentNoTextArea = document.querySelector('textarea');
+
+    try {
+        // Kullanıcı ID'sini almak için API'ye istek gönder
+        const userIdResponse = await fetch('http://localhost:3005/api/getUserID', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName })
+        });
+
+        const userIdData = await userIdResponse.json();
+
+        if (userIdData.error) {
+            alert(userIdData.error);
+            return;
+        }
+
+        const userId = userIdData.id;
+
+        // Kullanıcı ID'si ile apartman numarasını almak için API'ye istek gönder
+        const apartmentResponse = await fetch(`http://localhost:3005/api/users/${userId}/apartment`);
+
+        const apartmentData = await apartmentResponse.json();
+
+        if (apartmentData.error) {
+            alert(apartmentData.error);
+        } else {
+            // Apartman numarasını textarea'ya yaz
+            apartmentNoTextArea.value = apartmentData.apartment_number;
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+    }
+});
+
+        </script>
         
 
     </body>
