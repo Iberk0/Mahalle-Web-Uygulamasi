@@ -34,9 +34,8 @@
     <div class="container-flex d-flex justify-content-around p-5"> 
         <!-- İlk Kart -->
         <div class="container p-5" style="background-color: #16243d; border-radius: 15px; max-width: 35%; margin-top: 20px; margin-bottom: 20px;">
-            <h1 style="color: antiquewhite;" class="text-center mb-4">Assign Apartment</h1>
-    
-            <form id="assignmentForm1">
+            <h1 style="color: antiquewhite;" class="text-center mb-4">Assign Apartment No</h1>
+            <form id="assignmentForm">
                 <!-- First Name -->
                 <div class="mb-3">
                     <label for="firstName" class="form-label" style="color: #ffffff;">First Name</label>
@@ -48,13 +47,11 @@
                     <label for="lastName" class="form-label" style="color: #ffffff;">Last Name</label>
                     <input type="text" class="form-control" id="lastName" required>
                 </div>
-    
                 <!-- Apartment Number -->
                 <div class="mb-3">
                     <label for="apartmentNo" class="form-label" style="color: #ffffff;">Apartment Number</label>
                     <input type="text" class="form-control" id="apartmentNo" required>
                 </div>
-    
                 <!-- Submit Button -->
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">Assign</button>
@@ -116,47 +113,40 @@
         <script src="js/main.js"></script>
 
         <script>
-           document.getElementById("assignmentForm").addEventListener("submit", async function(event) {
-    event.preventDefault(); // Prevent form submission
-
-    const firstName = document.getElementById("firstName").value;
-    const lastName = document.getElementById("lastName").value;
-    const apartmentNo = document.getElementById("apartmentNo").value;
-
-    try {
-        // Fetch user_id based on first name and last name
-        const response = await fetch('http://localhost:3005/api/getUserID', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName })
-        });
-
-        const data = await response.json();
-        const resident_id = data.id;
-        if (response.ok) {
-
-            // Send the apartment assignment request with resident_id as userID
-            const assignResponse = await fetch('http://localhost:3005/api/assignApartment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resident_id, apartmentNo })
-            });
-
-            const assignResult = await assignResponse.json();
-            alert("Apartment assigned successfully.");
-            firstName.value = '';
-            lastName.value  ='';
-            apartmentNo.value= '';
-
-        } else {
-            alert(data.error || "User not found.");
-        }
-    } catch (error) {
-        alert("An error occurred: " + error.message);
-    }
-});
-
-        </script>
+            document.getElementById("assignmentForm").addEventListener("submit", async function(event) {
+     event.preventDefault(); // Prevent form submission
+     const firstName = document.getElementById("firstName").value;
+     const lastName = document.getElementById("lastName").value;
+     const apartmentNo = document.getElementById("apartmentNo").value;
+     try {
+         // Fetch user_id based on first name and last name
+         const response = await fetch('http://localhost:3005/api/getUserID', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ firstName, lastName })
+         });
+         const data = await response.json();
+         const resident_id = data.id;
+         if (response.ok) {
+             // Send the apartment assignment request with resident_id as userID
+             const assignResponse = await fetch('http://localhost:3005/api/assignApartment', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ resident_id, apartmentNo })
+             });
+             const assignResult = await assignResponse.json();
+             alert("Apartment assigned successfully.");
+             firstName.value = '';
+             lastName.value  ='';
+             apartmentNo.value= '';
+         } else {
+             alert(data.error || "User not found.");
+         }
+     } catch (error) {
+         alert("An error occurred: " + error.message);
+     }
+ });
+         </script>
         <script>
             document.getElementById('assignmentForm2').addEventListener('submit', async function(event) {
     event.preventDefault(); // Formun varsayılan submit davranışını engelle

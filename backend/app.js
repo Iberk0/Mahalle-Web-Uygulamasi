@@ -89,7 +89,7 @@ app.get('/api/users/:id/apartment', (req, res) => {
 // Mesaj Gönderme (Send Message)
 app.post('/api/messages', (req, res) => {
     const { userID, username, message } = req.body;
-    const query = `INSERT INTO messages (userID, username, message, messagetime) VALUES (?, ?, ?, datetime('now'))`;
+    const query = `INSERT INTO messages (userID, username, message, messagetime) VALUES (?, ?, ?, datetime('now','localtime'))`;
 
     db.run(query, [userID, username, message], function (err) {
         if (err) {
