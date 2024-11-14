@@ -47,7 +47,71 @@
 
         <!-- Template Javascript -->
         <script src="js/main.js"></script>
-
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    // Servis verilerini almak için API çağrısı
+                    const response = await fetch('http://localhost:3005/api/services');
+                    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+        
+                    const services = await response.json();
+                    console.log('Fetched services:', services); // Gelen veriyi kontrol etmek için
+        
+                    const container = document.createElement('div');
+                    container.classList.add('container-flex', 'd-flex', 'flex-wrap', 'justify-content-around', 'p-5');
+        
+                    // Her bir servis kaydı için kart oluşturma
+                    services.forEach(service => {
+                        const card = document.createElement('div');
+                        card.classList.add('container', 'p-5');
+                        card.style.borderRadius = '15px';
+                        card.style.maxWidth = '35%';
+                        card.style.marginTop = '20px';
+                        card.style.marginBottom = '20px';
+        
+                        // Servis türüne göre arka plan rengini belirleme
+                        let backgroundColor = '#16243d'; // Default renk
+        
+                        if (service.service_type.toLowerCase() === 'electrician') {
+                            backgroundColor = 'rgb(15,109,218)';
+                        } else if (service.service_type.toLowerCase() === 'plumber') {
+                            backgroundColor = 'rgb(236,184,11)';
+                        } else if (service.service_type.toLowerCase() === 'locksmith') {
+                            backgroundColor = 'rgb(236,11,49)';
+                        } else if (service.service_type.toLowerCase() === 'market') {
+                            backgroundColor = 'rgb(11,236,86)';
+                        }
+        
+                        card.style.backgroundColor = backgroundColor;
+        
+                        card.innerHTML = `
+                            <h2 style="color: white;" class="text-center mb-4">${service.service_type.charAt(0).toUpperCase() + service.service_type.slice(1)}</h2>
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #ffffff;">Name</label>
+                                <input type="text" class="form-control text-center" value="${service.first_name} ${service.last_name}" readonly style="background-color: white; color: black;">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #ffffff;">Phone Number</label>
+                                <input type="text" class="form-control text-center" value="${service.telephone_number}" readonly style="background-color: white; color: black;">
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+        
+                    // Kartları sayfaya ekleme
+                    document.body.insertBefore(container, document.getElementById('footer'));
+                } catch (error) {
+                    console.error('Error loading services:', error);
+                    alert('Servis verileri yüklenirken bir hata oluştu. Lütfen konsolu kontrol edin.');
+                }
+            });
+        </script>
+        
+            
+            
 
 
     </body>

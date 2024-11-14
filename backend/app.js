@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
 const { stringify } = require('querystring');
+const { Certificate } = require('crypto');
 
 // CORS ayarları
 app.use(cors());
@@ -112,14 +113,31 @@ app.get('/api/messages', (req, res) => {
     });
 });
 
-
+// Mesaj silme (Delete Message)
+app.delete('/api/messages/:messageID', (req, res) => {
+    const messageID = req.params.messageID; // messageID'yi req.params ile alıyoruz
+    const query = `DELETE FROM messages WHERE messageID = ?`;
+    db.run(query, [messageID], function (err) {
+        if (err) {
+            res.status(500).json({ error: 'Mesaj silinemedi' });
+        } else if (this.changes > 0) {
+            res.json({ message: 'Mesaj silindi' });
+        } else {
+            res.status(404).json({ error: 'Mesaj bulunamadı' });
+        }
+    });
+});
 //residentları listeleyen endpoint
 app.get('/api/users/managersite', (req, res) => {
-    const managerId = 9; // Manager kullanıcının id'si
+    // Manager rolüne sahip kullanıcının site_no'sunu alıyoruz
+    const getManagerSiteQuery = `
+        SELECT apartments.site_no 
+        FROM users
+        JOIN apartments ON users.id = apartments.resident_id
+        WHERE users.role = 'manager'
+    `;
     
-    // Manager'in site_no'sunu al
-    const getManagerSiteQuery = `SELECT site_no FROM apartments WHERE resident_id = ?`;
-    db.get(getManagerSiteQuery, [managerId], (err, managerRow) => {
+    db.get(getManagerSiteQuery, (err, managerRow) => {
         if (err) {
             return res.status(500).json({ error: 'Manager site_no getirilemedi' });
         }
@@ -127,7 +145,7 @@ app.get('/api/users/managersite', (req, res) => {
         if (managerRow) {
             const managerSiteNo = managerRow.site_no;
             
-            // Manager'in site_no'su ile aynı site_no'ya sahip kullanıcıları getir
+            // Manager'in site_no'su ile aynı site_no'ya sahip kullanıcıları getiriyoruz
             const getUsersQuery = `
                 SELECT users.name, users.surname, users.email, apartments.daire_no
                 FROM users
@@ -147,8 +165,6 @@ app.get('/api/users/managersite', (req, res) => {
         }
     });
 });
-
-
 // Endpoint to get userID based on first name and last name
 app.post('/api/getUserID', async (req, res) => {
     const { firstName, lastName } = req.body;
@@ -179,45 +195,41 @@ app.post('/api/assignApartment', async (req, res) => {
     }
 });
 
-//delete user endpoint
-app.delete('/api/users/:firstName/:lastName', (req, res) => {
+//endpoint to delete an user but a manager
+app.delete('/api/users/:firstName/:lastName', async (req, res) => {
     const { firstName, lastName } = req.params;
 
-    const query = `DELETE FROM users WHERE name = ? AND surname = ?`;
-
-    db.run(query, [firstName, lastName], function(err) {
-        if (err) {
-            return res.status(500).json({ error: 'Kullanıcı silinemedi' });
-        } else if (this.changes > 0) {
-            res.json({ message: 'Kullanıcı başarıyla silindi' });
-        } else {
-            res.status(404).json({ error: 'Kullanıcı bulunamadı' });
-        }
-    });
-});
-
-// Kullanıcıyı isim ve soyisimle silen endpoint
-app.delete('/api/deleteUser', async (req, res) => {
-    const { firstName, lastName } = req.body;
-
-    try {
-        // Kullanıcıyı isim ve soyisimle sorgula
-        const result = await db.query(
-            'DELETE FROM users WHERE first_name = $1 AND last_name = $2 RETURNING *',
-            [firstName, lastName]
+    const checkIfManager = await new Promise((resolve, reject) => {
+        db.get(
+            'SELECT role FROM users WHERE name = ? AND surname = ?',
+            [firstName, lastName],
+            (err, row) => {
+                if (err) reject(err);
+                resolve(row); // Kullanıcıyı bulursa döner, aksi halde `undefined`
+            }
         );
+    });
 
-        if (result.rowCount > 0) {
-            res.json({ message: 'User deleted successfully' });
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    if(checkIfManager.role === 'manager'){
+        return res.status(500).json({ error: 'You cannot delete a manager account' });
     }
-});
+    else{
+        const query = `DELETE FROM users WHERE name = ? AND surname = ?`;
 
+        db.run(query, [firstName, lastName], function(err) {
+            if (err) {
+                return res.status(500).json({ error: 'Kullanıcı silinemedi' });
+            } else if (this.changes > 0) {
+                res.json({ message: 'Kullanıcı başarıyla silindi' });
+            } else {
+                res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+            }
+        });
+    }
+
+
+
+});
 //add service
 app.post('/api/addService', (req, res) => {
     console.log('Add Service Request Body:', req.body);
@@ -227,7 +239,7 @@ app.post('/api/addService', (req, res) => {
     if (!firstName || !lastName || !telephoneNumber || !serviceType) {
         return res.status(400).json({ error: 'Tüm alanlar zorunludur' });
     }
-
+    
     const query = `INSERT INTO services (first_name, last_name, telephone_number, service_type) VALUES (?, ?, ?, ?)`;
     db.run(query, [firstName, lastName, telephoneNumber, serviceType], function (err) {
         if (err) {
@@ -236,6 +248,24 @@ app.post('/api/addService', (req, res) => {
         } else {
             res.status(201).json({ message: 'Servis başarıyla eklendi', serviceId: this.lastID });
         }
+    });
+});
+
+// Servis elemanlarını getirmek için endpoint
+
+app.get('/api/services', (req, res) => {
+    const getAllServicesQuery = `
+        SELECT serviceid, first_name, last_name, telephone_number, service_type
+        FROM services
+    `;
+    
+    db.all(getAllServicesQuery, (err, rows) => {
+        if (err) {
+            console.error('Error fetching services:', err);
+            return res.status(500).json({ error: 'Servis bilgileri getirilemedi' });
+        }
+        
+        res.json(rows); // Tüm servis kayıtları döndürülüyor
     });
 });
 
