@@ -71,20 +71,20 @@ app.get('/api/session', (req, res) => {
     }
 });
 
-// Kullanıcının apartman numarasını getiren endpoint
 app.get('/api/users/:id/apartment', (req, res) => {
     const { id } = req.params;
-    const query = `SELECT apartment_number FROM apartments WHERE resident_id = ?`;
+    const query = `SELECT daire_no, site_no FROM apartments WHERE resident_id = ?`;
     db.get(query, [id], (err, row) => {
         if (err) {
-            res.status(500).json({ error: 'Apartman numarası getirilemedi' });
+            res.status(500).json({ error: 'Bilgiler getirilemedi' });
         } else if (row) {
-            res.json({ apartment_number: row.apartment_number });
+            res.json({ daire_no: row.daire_no, site_no: row.site_no });
         } else {
-            res.status(404).json({ error: 'Apartman numarası bulunamadı' });
+            res.status(404).json({ error: 'Kayıt bulunamadı' });
         }
     });
 });
+
 
 // Mesaj Gönderme (Send Message)
 app.post('/api/messages', (req, res) => {
@@ -113,6 +113,42 @@ app.get('/api/messages', (req, res) => {
 });
 
 
+//residentları listeleyen endpoint
+app.get('/api/users/managersite', (req, res) => {
+    const managerId = 9; // Manager kullanıcının id'si
+    
+    // Manager'in site_no'sunu al
+    const getManagerSiteQuery = `SELECT site_no FROM apartments WHERE resident_id = ?`;
+    db.get(getManagerSiteQuery, [managerId], (err, managerRow) => {
+        if (err) {
+            return res.status(500).json({ error: 'Manager site_no getirilemedi' });
+        }
+        
+        if (managerRow) {
+            const managerSiteNo = managerRow.site_no;
+            
+            // Manager'in site_no'su ile aynı site_no'ya sahip kullanıcıları getir
+            const getUsersQuery = `
+                SELECT users.name, users.surname, users.email, apartments.daire_no
+                FROM users
+                JOIN apartments ON users.id = apartments.resident_id
+                WHERE apartments.site_no = ?
+            `;
+            
+            db.all(getUsersQuery, [managerSiteNo], (err, rows) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Kullanıcı bilgileri getirilemedi' });
+                }
+                
+                res.json(rows);
+            });
+        } else {
+            res.status(404).json({ error: 'Manager site_no bulunamadı' });
+        }
+    });
+});
+
+
 // Endpoint to get userID based on first name and last name
 app.post('/api/getUserID', async (req, res) => {
     const { firstName, lastName } = req.body;
@@ -136,28 +172,73 @@ app.post('/api/getUserID', async (req, res) => {
 app.post('/api/assignApartment', async (req, res) => {
     const { resident_id, apartmentNo } = req.body;
     try {
-        await db.run('INSERT INTO apartments (apartment_number, resident_id) VALUES (?, ?)', [apartmentNo, resident_id]);
+        await db.run('INSERT INTO apartments (daire_no, resident_id) VALUES (?, ?)', [apartmentNo, resident_id]);
         res.json({ message: 'Apartment assigned successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to assign apartment' });
     }
 });
 
-// Mesaj silme (Delete Message)
-app.delete('/api/messages/:messageID', (req, res) => {
-    const messageID = req.params.messageID; // messageID'yi req.params ile alıyoruz
-    const query = `DELETE FROM messages WHERE messageID = ?`;
+//delete user endpoint
+app.delete('/api/users/:firstName/:lastName', (req, res) => {
+    const { firstName, lastName } = req.params;
 
-    db.run(query, [messageID], function (err) {
+    const query = `DELETE FROM users WHERE name = ? AND surname = ?`;
+
+    db.run(query, [firstName, lastName], function(err) {
         if (err) {
-            res.status(500).json({ error: 'Mesaj silinemedi' });
+            return res.status(500).json({ error: 'Kullanıcı silinemedi' });
         } else if (this.changes > 0) {
-            res.json({ message: 'Mesaj silindi' });
+            res.json({ message: 'Kullanıcı başarıyla silindi' });
         } else {
-            res.status(404).json({ error: 'Mesaj bulunamadı' });
+            res.status(404).json({ error: 'Kullanıcı bulunamadı' });
         }
     });
 });
+
+// Kullanıcıyı isim ve soyisimle silen endpoint
+app.delete('/api/deleteUser', async (req, res) => {
+    const { firstName, lastName } = req.body;
+
+    try {
+        // Kullanıcıyı isim ve soyisimle sorgula
+        const result = await db.query(
+            'DELETE FROM users WHERE first_name = $1 AND last_name = $2 RETURNING *',
+            [firstName, lastName]
+        );
+
+        if (result.rowCount > 0) {
+            res.json({ message: 'User deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//add service
+app.post('/api/addService', (req, res) => {
+    console.log('Add Service Request Body:', req.body);
+    const { firstName, lastName, telephoneNumber, serviceType } = req.body;
+
+    // Gerekli tüm alanların sağlandığından emin olun
+    if (!firstName || !lastName || !telephoneNumber || !serviceType) {
+        return res.status(400).json({ error: 'Tüm alanlar zorunludur' });
+    }
+
+    const query = `INSERT INTO services (first_name, last_name, telephone_number, service_type) VALUES (?, ?, ?, ?)`;
+    db.run(query, [firstName, lastName, telephoneNumber, serviceType], function (err) {
+        if (err) {
+            console.error('Hata:', err);
+            return res.status(500).json({ error: 'Servis eklenirken bir hata oluştu' });
+        } else {
+            res.status(201).json({ message: 'Servis başarıyla eklendi', serviceId: this.lastID });
+        }
+    });
+});
+
 
 // Sunucuyu Başlatma
 const PORT = 3005;

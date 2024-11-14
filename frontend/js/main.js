@@ -167,19 +167,32 @@ window.onload = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const profileBtn = document.getElementById('profile-btn');
     const loginBtn = document.getElementById('login-btn');
+
+
+    const techPage = document.getElementById('tech-page');
+    const homePage = document.getElementById('home-page');
+    const servicePage = document.getElementById('services-page');
     const messagePage = document.getElementById('message-page');
+    const aboutPage = document.getElementById('about-page');
     const commentPage = document.getElementById('comment-page');
     if (user) {
         profileBtn.style.display = 'block';
         messagePage.style.display = 'block';
         commentPage.style.display = 'block';
+        techPage.style.display = 'block';
+        aboutPage.style.display = 'none';
+        homePage.style.display = 'none';
+        servicePage.style.display = 'none';
         loginBtn.style.display = 'none';
     } else {
         profileBtn.style.display = 'none';
-        loginBtn.style.display = 'block';
         messagePage.style.display = 'none';
         commentPage.style.display = 'none';
+        techPage.style.display = 'none';
+        aboutPage.style.display = 'block';
+        homePage.style.display = 'block';
+        servicePage.style.display = 'block';
+        loginBtn.style.display = 'block';
         
     }
 };
-
