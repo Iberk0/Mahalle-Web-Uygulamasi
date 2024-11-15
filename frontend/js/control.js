@@ -159,3 +159,46 @@ document.getElementById('assignmentForm3').addEventListener('submit', async func
         alert('Bir hata oluştu. Lütfen tekrar deneyin.');
     }
 });
+
+//Event ekleme 
+
+
+    document.getElementById('assignmentForm4').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Sayfanın yeniden yüklenmesini engelle
+
+        // Formdan inputları al
+        const eventName = document.getElementById('eventName').value.trim();
+        const description = document.getElementById('description').value.trim();
+
+        if (!eventName || !description) {
+            alert('Event name and description cannot be empty!');
+            return;
+        }
+
+        try {
+            // API'ye POST isteği gönder
+            const response = await fetch('http://localhost:3005/api/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    event_name: eventName,
+                    event_description: description,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(`Event created successfully! Event ID: ${result.event_id}`);
+                document.getElementById('assignmentForm4').reset(); // Formu temizle
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error submitting the form:', error);
+            alert('An error occurred while creating the event.');
+        }
+    });
+

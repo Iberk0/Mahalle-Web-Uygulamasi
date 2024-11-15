@@ -175,11 +175,17 @@ window.onload = async () => {
     const messagePage = document.getElementById('message-page');
     const aboutPage = document.getElementById('about-page');
     const commentPage = document.getElementById('comment-page');
+    const eventPage = document.getElementById('event-page');
+    const complainPage = document.getElementById('complain-page');
+
+
     if (user) {
         profileBtn.style.display = 'block';
         messagePage.style.display = 'block';
         commentPage.style.display = 'block';
+        complainPage.style.display = 'block';
         techPage.style.display = 'block';
+        eventPage.style.display = 'block';
         aboutPage.style.display = 'none';
         homePage.style.display = 'none';
         servicePage.style.display = 'none';
@@ -189,6 +195,8 @@ window.onload = async () => {
         messagePage.style.display = 'none';
         commentPage.style.display = 'none';
         techPage.style.display = 'none';
+        complainPage.style.display = 'none';
+        eventPage.style.display = 'none';
         aboutPage.style.display = 'block';
         homePage.style.display = 'block';
         servicePage.style.display = 'block';

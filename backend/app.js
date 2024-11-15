@@ -269,6 +269,109 @@ app.get('/api/services', (req, res) => {
     });
 });
 
+// Event oluşturma endpoint'i
+app.post('/api/events', (req, res) => {
+    const { event_name, event_description } = req.body;
+
+    if (!event_name || !event_description) {
+        return res.status(400).json({ error: 'Event name and description are required' });
+    }
+
+    const insertEventQuery = `INSERT INTO event (event_name, event_description) VALUES (?, ?)`;
+
+    db.run(insertEventQuery, [event_name, event_description], function (err) {
+        if (err) {
+            console.error('Error inserting event:', err);
+            return res.status(500).json({ error: 'Failed to create event' });
+        }
+
+        res.status(201).json({ 
+            message: 'Event created successfully', 
+            event_id: this.lastID 
+        });
+    });
+});
+// Eventleri listeleme endpoint'i
+app.get('/api/events', (req, res) => {
+    const getEventsQuery = `SELECT * FROM event`;
+
+    db.all(getEventsQuery, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching events:', err);
+            return res.status(500).json({ error: 'Failed to retrieve events' });
+        }
+
+        res.status(200).json(rows);
+    });
+});
+
+//Complain ekleme
+app.post('/api/complaint', (req, res) => {
+    const { postType, messageInput, userId } = req.body; // POST verilerini al
+
+    let complainer_name = null;
+    let complainer_surname = null;
+    let complainer_email = null;
+
+    // Eğer "named" seçildiyse, login olan kullanıcının bilgilerini kullan
+    if (postType === 'name' && userId) {
+        db.get('SELECT name, surname, email FROM users WHERE id = ?', [userId], (err, row) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Error retrieving user data.' });
+            }
+            if (row) {
+                complainer_name = row.name;
+                complainer_surname = row.surname;
+                complainer_email = row.email;
+            }
+            
+            // Veriyi complain tablosuna ekle
+            db.run(
+                'INSERT INTO complain (complainer_name, complainer_surname, complainer_email, complain) VALUES (?, ?, ?, ?)',
+                [complainer_name, complainer_surname, complainer_email, messageInput],
+                function (err) {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Error inserting complain.' });
+                    }
+                    res.status(201).json({ message: 'Complaint submitted successfully.' });
+                }
+            );
+        });
+    } else {
+        // Eğer "anonymous" seçildiyse, bilgileri null olarak kaydet
+        db.run(
+            'INSERT INTO complain (complainer_name, complainer_surname, complainer_email, complain) VALUES (?, ?, ?, ?)',
+            [complainer_name, complainer_surname, complainer_email, messageInput],
+            function (err) {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ message: 'Error inserting complain.' });
+                }
+                res.status(201).json({ message: 'Complaint submitted successfully.' });
+            }
+        );
+    }
+});
+
+//Complainleri listele
+app.get('/api/complaints', (req, res) => {
+    // Complaints tablosundaki tüm verileri getiriyoruz
+    const getComplaintsQuery = `
+        SELECT complain.complainer_name, complain.complainer_surname, complain.complainer_email, complain.complain
+        FROM complain
+    `;
+    
+    db.all(getComplaintsQuery, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: 'Şikayetler getirilemedi' });
+        }
+        
+        res.json(rows); // Şikayetlerin tüm bilgilerini döndür
+    });
+});
+
 
 // Sunucuyu Başlatma
 const PORT = 3005;
