@@ -183,7 +183,10 @@ window.onload = async () => {
         profileBtn.style.display = 'block';
         messagePage.style.display = 'block';
         commentPage.style.display = 'block';
-        complainPage.style.display = 'block';
+        if(user.role ==='resident'){
+            complainPage.style.display = 'block';
+        }
+        
         techPage.style.display = 'block';
         eventPage.style.display = 'block';
         aboutPage.style.display = 'none';
