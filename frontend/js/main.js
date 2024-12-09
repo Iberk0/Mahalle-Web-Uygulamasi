@@ -104,71 +104,104 @@
 
 
 
-// Navbar ve footer'ı yükleyen fonksiyon
-function loadComponent(selector, file) {
-  fetch(file)
-    .then(response => response.text())
-    .then(data => {
-      document.querySelector(selector).innerHTML = data;
-    })
-    .catch(error => console.log('Bileşen yüklenirken hata oluştu:', error));
+async function loadMessages() {
+    try {
+        const response = await fetch('http://localhost:3005/api/messages');
+        const messages = await response.json();
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.innerHTML = '';
+
+        messages.sort((a, b) => new Date(b.messagetime) - new Date(a.messagetime));
+
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'd-flex justify-content-between mb-3';
+
+            const messageContent = document.createElement('div');
+            messageContent.innerHTML = `
+                <strong style="color: ${message.username === 'manager' ? '#FF1414' : 'black'};">
+                    ${message.username || 'Anonymous'}
+                </strong> -> ${message.message}
+                <br><small>${new Date(message.messagetime).toLocaleString()}</small>
+            `;
+
+            // Eğer kullanıcı manager ise silme butonu ekle
+            if (user && user.role === "manager") {
+                const removeButton = document.createElement('button');
+                removeButton.className = 'btn';
+                removeButton.style.cssText = `
+                    height: 30px; 
+                    width: 30px; 
+                    border: none; 
+                    background-color: white; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    color: red;
+                `;
+                removeButton.textContent = 'X';
+
+                removeButton.addEventListener('click', async () => {
+                    try {
+                        const deleteResponse = await fetch(`http://localhost:3005/api/messages/${message.messageID}`, {
+                            method: 'DELETE'
+                        });
+                        const result = await deleteResponse.json();
+
+                        if (deleteResponse.ok) {
+                            alert('Mesaj silindi');
+                            loadMessages();
+                        } else {
+                            alert(result.error || 'Mesaj silinemedi');
+                        }
+                    } catch (error) {
+                        console.error('Mesaj silinirken hata oluştu:', error);
+                        alert('Mesaj silinemedi');
+                    }
+                });
+
+                messageElement.appendChild(removeButton);
+            }
+
+            messageElement.prepend(messageContent);
+            messagesContainer.appendChild(messageElement);
+        });
+    } catch (error) {
+        console.error('Mesajları yüklerken hata oluştu:', error);
+    }
 }
 
-// Sayfa yüklendiğinde navbar ve footer'ı çağır
-window.onload = () => {
-  loadComponent('#navbar', 'NAVBAR.html');
-  loadComponent('#footer', 'FOOTER.html');
-};
+async function loadComponent(selector, file) {
+    const element = document.querySelector(selector);
+    const response = await fetch(file);
+    const html = await response.text();
+    element.innerHTML = html;
+}
 
-
-function loadComponent(selector, file) {
-    fetch(file)
-      .then(response => response.text())
-      .then(data => {
-        document.querySelector(selector).innerHTML = data;
-        if (selector === '#navbar') {
-          highlightActiveLink();
-        }
-      })
-      .catch(error => console.log('Bileşen yüklenirken hata oluştu:', error));
-  }
-  
-  // Aktif bağlantıyı vurgulayan fonksiyon
-  function highlightActiveLink() {
+function highlightActiveLink() {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('#navbar a');
-  
+
     navLinks.forEach(link => {
-      // Bağlantının href değeriyle geçerli sayfanın yolunu karşılaştır
-      if (link.getAttribute('href') === currentPath.split('/').pop()) {
-        link.classList.add('active');
-      }
+        if (link.getAttribute('href') === currentPath.split('/').pop()) {
+            link.classList.add('active');
+        }
     });
-  }
-  
- 
+}
 
-  // Sayfa yüklendiğinde navbar ve footer'ı çağır
-// Bileşenleri yüklemek ve kullanıcı durumunu ayarlamak için tek bir fonksiyon
-window.onload = async () => {
-    // Bileşen yükleme fonksiyonu
-    const loadComponent = async (selector, file) => {
-        const element = document.querySelector(selector);
-        const response = await fetch(file);
-        const html = await response.text();
-        element.innerHTML = html;
-    };
-
-    // Navbar ve Footer bileşenlerini yükleme
+document.addEventListener('DOMContentLoaded', async () => {
+    // Navbar ve Footer yükle
     await loadComponent('#navbar', 'NAVBAR.html');
     await loadComponent('#footer', 'FOOTER.html');
+    highlightActiveLink();
 
-    // Kullanıcı bilgilerini localStorage'dan al ve butonları ayarla
+    // Kullanıcı durumunu ayarla
     const user = JSON.parse(localStorage.getItem('user'));
     const profileBtn = document.getElementById('profile-btn');
     const loginBtn = document.getElementById('login-btn');
-
-
     const techPage = document.getElementById('tech-page');
     const homePage = document.getElementById('home-page');
     const servicePage = document.getElementById('services-page');
@@ -178,32 +211,31 @@ window.onload = async () => {
     const eventPage = document.getElementById('event-page');
     const complainPage = document.getElementById('complain-page');
 
-
     if (user) {
-        profileBtn.style.display = 'block';
-        messagePage.style.display = 'block';
-        commentPage.style.display = 'block';
-        if(user.role ==='resident'){
-            complainPage.style.display = 'block';
-        }
-        
-        techPage.style.display = 'block';
-        eventPage.style.display = 'block';
-        aboutPage.style.display = 'none';
-        homePage.style.display = 'none';
-        servicePage.style.display = 'none';
-        loginBtn.style.display = 'none';
+        if (profileBtn) profileBtn.style.display = 'block';
+        if (messagePage) messagePage.style.display = 'block';
+        if (commentPage) commentPage.style.display = 'block';
+        if (user.role === 'resident' && complainPage) complainPage.style.display = 'block';
+        if (techPage) techPage.style.display = 'block';
+        if (eventPage) eventPage.style.display = 'block';
+        if (aboutPage) aboutPage.style.display = 'none';
+        if (homePage) homePage.style.display = 'none';
+        if (servicePage) servicePage.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'none';
     } else {
-        profileBtn.style.display = 'none';
-        messagePage.style.display = 'none';
-        commentPage.style.display = 'none';
-        techPage.style.display = 'none';
-        complainPage.style.display = 'none';
-        eventPage.style.display = 'none';
-        aboutPage.style.display = 'block';
-        homePage.style.display = 'block';
-        servicePage.style.display = 'block';
-        loginBtn.style.display = 'block';
-        
+        if (profileBtn) profileBtn.style.display = 'none';
+        if (messagePage) messagePage.style.display = 'none';
+        if (commentPage) commentPage.style.display = 'none';
+        if (techPage) techPage.style.display = 'none';
+        if (complainPage) complainPage.style.display = 'none';
+        if (eventPage) eventPage.style.display = 'none';
+        if (aboutPage) aboutPage.style.display = 'block';
+        if (homePage) homePage.style.display = 'block';
+        if (servicePage) servicePage.style.display = 'block';
+        if (loginBtn) loginBtn.style.display = 'block';
     }
-};
+
+    // Mesajları yükle
+    loadMessages();
+    setInterval(loadMessages, 5000);
+});

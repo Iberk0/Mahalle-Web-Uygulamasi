@@ -1,0 +1,138 @@
+[33mcommit 7b6a614cc4c2c8d69064050ad37436419d53cdd0[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sun Dec 8 20:38:16 2024 +0300
+
+    son değişiklikler
+
+[33mcommit de10c745b225c3d66068ea0265ee58b094155bc0[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sat Nov 16 02:24:40 2024 +0300
+
+    mantık hataları düzeltildi
+
+[33mcommit bc23b989f162f9cccdffe4bb650ca615dfa824b8[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sat Nov 16 02:04:28 2024 +0300
+
+    event-complain pages bitti
+
+[33mcommit e9b381bb8ef96a63c40dc295bef38b843209380c[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Fri Nov 15 00:39:51 2024 +0300
+
+    servisler çalışıyor user silme çalışıyor
+
+[33mcommit 63117ac7b5c311c235c8ee2a89f0299abf284963[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Thu Nov 14 17:38:12 2024 +0300
+
+    servis-residents-deluser foksiyonları eklendi
+
+[33mcommit 84883af65c773335f3a77d8558cc49eac528cdc6[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Fri Nov 8 02:43:52 2024 +0300
+
+    acık oynadım
+
+[33mcommit 3f431c95874b518535b6ce130dce6687e446eb3e[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Fri Nov 8 02:10:49 2024 +0300
+
+    control.hmtl geliştirildi, actuel sayfası özelleşti
+
+[33mcommit 878ca61fd9e25a9198d4820908f52ee19f90592b[m
+Merge: 6898b67 60c30aa
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Thu Nov 7 19:01:56 2024 +0300
+
+    Merge branch 'main' of github.com:Iberk0/inf493
+
+[33mcommit 6898b67ab9ca1c73d7f7b8d579fa7d49eb872619[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Thu Nov 7 18:53:52 2024 +0300
+
+    management çalışıyor
+
+[33mcommit 875aeb29cd13591bd35875ca784d8395a4af02a5[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Thu Nov 7 18:50:44 2024 +0300
+
+    management çalışıyor
+
+[33mcommit 60c30aa7721e488050dc7311b123537f6c91a479[m
+Author: ayberk <92791398+Iberk0@users.noreply.github.com>
+Date:   Tue Nov 5 00:26:05 2024 +0300
+
+    Update README.md
+
+[33mcommit 26c601ff19333be82cfe3346bcc57f27b7cc5388[m
+Author: ayberk <92791398+Iberk0@users.noreply.github.com>
+Date:   Tue Nov 5 00:25:16 2024 +0300
+
+    Update README.md
+
+[33mcommit 1d160dba73a11a2d94b2a6a0b226698846e892ea[m
+Author: ayberk <92791398+Iberk0@users.noreply.github.com>
+Date:   Tue Nov 5 00:23:31 2024 +0300
+
+    Create README.md
+
+[33mcommit 1269f45c311f124bd4788fa0b7d47c3c1475d8b2[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Mon Nov 4 21:34:19 2024 +0300
+
+    büyük oradanda bitti
+
+[33mcommit 7d8102add0e52246d88f9957326fc5782401f42f[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Mon Nov 4 03:31:04 2024 +0300
+
+    içinden geçtim backendin
+
+[33mcommit 047ec882902bd45d785024936a6488b6de5243d2[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Thu Oct 31 16:24:00 2024 +0300
+
+    yaptım bir şeyler
+
+[33mcommit 27c59b808bf4e41160bc27e836f7b1fe1f639c14[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Tue Oct 29 02:13:54 2024 +0300
+
+    forum sayfası eklendi ve profil güncellendi
+
+[33mcommit 467192e58b2eafda3c4f81446bdd7d6560cb6570[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Mon Oct 28 19:16:47 2024 +0300
+
+    login olunca değişiklikler tamamlandı
+
+[33mcommit 1dbbd12aa95ea76be466192d68a78908d5496d7d[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Mon Oct 28 18:30:12 2024 +0300
+
+    login ve signup çalışıyor
+
+[33mcommit 0788270ef0170f1e1dabf26372d1467379d5f1d0[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sun Oct 27 18:04:18 2024 +0300
+
+    Login ve Signup sayfaları
+
+[33mcommit 6e70ccace333f1628f35174583c0062ba740b92e[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sat Oct 26 23:00:01 2024 +0300
+
+    nav_footer ayarlanmış hal
+
+[33mcommit 1879c8de3d5aee3aa1e63952f0d3c3366a23cda1[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Mon Oct 21 22:28:12 2024 +0300
+
+    front-end part
+
+[33mcommit cc2d3c70ba766583810781c96a982ecaf2898e35[m
+Author: Iberk0 <1234.ayberk@gmail.com>
+Date:   Sun Oct 20 17:28:15 2024 +0300
+
+    başlangıç

@@ -355,11 +355,29 @@ app.post('/api/complaint', (req, res) => {
     }
 });
 
+
+
+// Event silme endpoint'i
+app.delete('/api/events/:event_id', (req, res) => {
+    const eventId = req.params.event_id;
+    const deleteEventQuery = `DELETE FROM event WHERE event_id = ?`;
+    db.run(deleteEventQuery, [eventId], function(err) {
+        if (err) {
+            return res.status(500).json({ error: 'Etkinlik silinemedi' });
+        } else if (this.changes > 0) {
+            return res.json({ message: 'Etkinlik silindi' });
+        } else {
+            return res.status(404).json({ error: 'Etkinlik bulunamadı' });
+        }
+    });
+});
+
+
+
 //Complainleri listele
 app.get('/api/complaints', (req, res) => {
-    // Complaints tablosundaki tüm verileri getiriyoruz
     const getComplaintsQuery = `
-        SELECT complain.complainer_name, complain.complainer_surname, complain.complainer_email, complain.complain
+        SELECT complain_id, complainer_name, complainer_surname, complainer_email, complain
         FROM complain
     `;
     
@@ -368,9 +386,63 @@ app.get('/api/complaints', (req, res) => {
             return res.status(500).json({ error: 'Şikayetler getirilemedi' });
         }
         
-        res.json(rows); // Şikayetlerin tüm bilgilerini döndür
+        res.json(rows);
     });
 });
+
+// Şikayet silme endpoint'i
+app.delete('/api/complaints/:complain_id', (req, res) => {
+    const complainId = req.params.complain_id;
+    const query = 'DELETE FROM complain WHERE complain_id = ?';
+    db.run(query, [complainId], function(err) {
+        if (err) {
+            return res.status(500).json({ error: 'Şikayet silinemedi' });
+        } else if (this.changes > 0) {
+            return res.json({ message: 'Şikayet başarıyla silindi' });
+        } else {
+            return res.status(404).json({ error: 'Şikayet bulunamadı' });
+        }
+    });
+});
+// Servis silme endpoint'i - Sadece manager erişebilir
+// Servis silme endpoint'i
+app.delete('/api/services/:serviceid', (req, res) => {
+    const serviceId = req.params.serviceid;
+    const userId = req.query.userId; // Query parametreden alıyoruz
+
+    if (!userId) {
+        return res.status(401).json({ error: "User ID not provided" });
+    }
+
+    // Veritabanından kullanıcı rolünü çek
+    db.get('SELECT role FROM users WHERE id = ?', [userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: 'Veritabanı hatası' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+        }
+
+        // Rol kontrolü
+        if (row.role !== 'manager') {
+            return res.status(403).json({ error: 'Bu işlemi yapmak için yetkiniz yok.' });
+        }
+
+        // Eğer kullanıcı manager ise servisi sil
+        const query = `DELETE FROM services WHERE serviceid = ?`;
+        db.run(query, [serviceId], function (err) {
+            if (err) {
+                return res.status(500).json({ error: 'Servis silinemedi' });
+            } else if (this.changes > 0) {
+                return res.json({ message: 'Servis başarıyla silindi' });
+            } else {
+                return res.status(404).json({ error: 'Servis bulunamadı' });
+            }
+        });
+    });
+});
+
 
 
 // Sunucuyu Başlatma

@@ -281,13 +281,13 @@
 
 .header-carousel .owl-nav .owl-prev {
     bottom: 30px;
-    left: 50%;
+    left: 35%; /* 65% yerine 35% kullan */
     transform: translateX(-50%);
     margin-left: 30px;
 }
 .header-carousel .owl-nav .owl-next {
     bottom: 30px;
-    right: 50%;
+    right: 35%; /* 65% yerine 35% kullan */
     transform: translateX(-50%);
     margin-right: 30px;
 }

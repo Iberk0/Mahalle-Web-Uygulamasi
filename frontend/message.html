@@ -15,7 +15,7 @@
     <!-- Icon Font Stylesheet -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Libraries Stylesheet -->
     <link rel="stylesheet" href="lib/animate/animate.min.css"/>
     <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet">
@@ -74,14 +74,25 @@
     <script src="js/main.js"></script>
     
     <script>
+        const form = document.getElementById('messageForm');
         const isAnonymous = document.getElementById('anonymous');
-        document.querySelector('.btn').addEventListener('click', sendMessageFunc);
-    
-        async function sendMessageFunc() {
-            const userID = localStorage.getItem('userID');
-            const username = isAnonymous.checked ? "Anonymous" : localStorage.getItem('userName'); // Değişiklik burada
-            const message = document.getElementById('messageInput').value; // Textarea ID'si güncellendi
-    
+        form.addEventListener('submit', sendMessageFunc);
+
+        async function sendMessageFunc(event) {
+            event.preventDefault(); // Formun sayfayı yenilemesini engelle
+
+            const user = JSON.parse(localStorage.getItem('user')); 
+            const userID = user ? user.id : null;
+            const username = isAnonymous.checked 
+                ? "Anonymous" 
+                : (user && user.name ? user.name : "Anonymous");
+            const message = document.getElementById('messageInput').value;
+
+            if (!message.trim()) {
+                alert('Lütfen bir mesaj giriniz.');
+                return;
+            }
+
             try {
                 const response = await fetch('http://localhost:3005/api/messages', {
                     method: 'POST',
@@ -94,26 +105,28 @@
                 const result = await response.json();
                 if (response.ok) {
                     alert(result.message);
+                    document.getElementById('messageInput').value = '';
                 } else {
-                    alert(result.error);
+                    alert(result.error || 'Mesaj gönderilemedi.');
                 }
             } catch (error) {
+                console.error(error);
                 alert('Mesaj gönderme hatası: ' + error);
             }
         }
     </script>
+
     <script>
-            document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", () => {
             const anonButton = document.getElementById("anonymous");
             const postTypeContainer = document.getElementById("postTypeContainer");
             const user = JSON.parse(localStorage.getItem('user'));
 
-            if (user.role === "manager") {
+            if (user && user.role === "manager") {
                 // Hide the radio buttons if the user is a manager
                 postTypeContainer.style.display = 'none';
             }
         });
     </script>
 </body>
-
 </html>
